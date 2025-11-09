@@ -1,0 +1,235 @@
+﻿<Window x:Class="Hangman_Esteban.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hangman_Esteban"
+        mc:Ignorable="d"
+        Title="Hangman - Esteban Coello" Height="900" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E2A38">
+
+    <Window.Resources>
+        <!-- Style principal pour tous les boutons -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#4F6D7A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="12"
+                                BorderBrush="#243447"
+                                BorderThickness="1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#5E87A1"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#3E5665"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style accentué (pour le Joker par exemple) -->
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background" Value="#FF9800"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="#E68900"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="12"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFB74D"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#E68900"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style pour les lettres du clavier -->
+        <Style x:Key="KeyButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Width" Value="45"/>
+            <Setter Property="Height" Value="55"/>
+            <Setter Property="Background" Value="#607D8B"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <!-- *************** Title *************** -->
+        <TextBlock Grid.Row="0"
+                   Text="🎩 Hangman"
+                   Foreground="White"
+                   FontSize="48"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+        <!-- *************** Footer *************** -->
+        <TextBlock Grid.Row="2"
+                   Text="By Esteban Coello"
+                   Foreground="#B0BEC5"
+                   FontSize="20"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+
+        <!-- *************** Main Content *************** -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1.5*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT PANEL -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <!-- Restart & Mute -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="🔄 Rejouer" Click="TB_Restart_Click" Style="{StaticResource ModernButton}" Width="150" Height="50" Margin="0,0,10,0"/>
+                    <Button x:Name="TB_Mute" Content="🔊 Son ON" Click="TB_Mute_Click" Style="{StaticResource ModernButton}" Width="150" Height="50"/>
+                </StackPanel>
+
+                <!-- Joker -->
+                <Border Height="25" Background="Transparent"/>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <Button x:Name="BTN_Joker" Content="🎲 Utiliser un Joker" Click="TB_Joker_Click" Style="{StaticResource AccentButton}" Width="210" Height="50" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="TB_Joker" Text="Il vous reste 2 Jokers" Foreground="White" FontSize="20" TextAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Difficulty -->
+                <Border Height="25" Background="Transparent"/>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <TextBlock Text="🎯 Difficulté" Foreground="White" FontSize="22" FontWeight="Bold" TextAlignment="Center" Margin="0,0,0,8"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="BTN_Easy" Content="Facile" Click="BTN_Easy_Click" Style="{StaticResource ModernButton}" Width="100" Margin="0,0,10,0"/>
+                        <Button x:Name="BTN_Medium" Content="Moyen" Click="BTN_Medium_Click" Style="{StaticResource ModernButton}" Width="100" Margin="0,0,10,0"/>
+                        <Button x:Name="BTN_Hard" Content="Difficile" Click="BTN_Hard_Click" Style="{StaticResource ModernButton}" Width="100"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- CENTER PANEL (Mot + Clavier) -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Image du pendu -->
+                <Image x:Name="PenduImage" Width="380" Height="380"/>
+                <!-- Mot caché -->
+                <TextBox Grid.Row="1"
+                         x:Name="TB_Display"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         FontSize="42"
+                         FontWeight="Bold"
+                         Width="500"
+                         Height="100"
+                         TextAlignment="Center"
+                         IsReadOnly="True"
+                         Background="#1E2A38"
+                         Foreground="White"
+                         BorderThickness="0"/>
+
+                <!-- Clavier -->
+                <StackPanel Grid.Row="2" VerticalAlignment="Center">
+                    <UniformGrid Columns="9">
+                        <Button Content="A" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="B" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="C" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="D" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="E" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="F" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="G" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="H" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="I" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="9">
+                        <Button Content="J" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="K" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="L" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="M" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="N" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="O" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="P" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="Q" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="R" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="8">
+                        <Button Content="S" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="T" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="U" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="V" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="W" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="X" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="Y" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                        <Button Content="Z" Style="{StaticResource KeyButton}" Click="letter_clicked"/>
+                    </UniformGrid>
+                </StackPanel>
+            </Grid>
+
+            <!-- RIGHT PANEL (Infos) -->
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBox x:Name="TB_Life"
+                         Text="Vies restantes: 6"
+                         FontSize="32"
+                         Width="400"
+                         Height="80"
+                         TextAlignment="Center"
+                         IsReadOnly="True"
+                         Background="#1E2A38"
+                         Foreground="White"
+                         BorderThickness="0"
+                         Margin="0,0,0,15"/>
+
+                <TextBox x:Name="TB_Timer"
+                         Text="Temps restant : 60"
+                         FontSize="32"
+                         Width="400"
+                         Height="80"
+                         TextAlignment="Center"
+                         IsReadOnly="True"
+                         Background="#1E2A38"
+                         Foreground="White"
+                         BorderThickness="0"/>
+                <Image x:Name="VieImage" Width="300" Height="300"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
