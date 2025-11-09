@@ -42,7 +42,7 @@ Timer : DispatcherTimer
 
 📁 Structure du projet
 Hangman_Esteban/
-│
+
 ├── Sound/
 
     ├── win.wav
@@ -55,19 +55,22 @@ Hangman_Esteban/
 
 ├── Images/
 
-    ├── 6.png
+    ─ 6.png
     
-    ├── 5.png
+    ─ 5.png
     
-    ├── ...
+    ─ ...
 
 ├── Vie/
-│   ├── 6.png
-│   ├── 5.png
-│   ├── ...
-│
+
+    ─ 6.png
+    ─ 5.png
+    ─ ...
+
 ├── MainWindow.xaml
+
 ├── MainWindow.xaml.cs
+
 └── README.md
 
 
