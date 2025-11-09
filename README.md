@@ -44,16 +44,23 @@ Timer : DispatcherTimer
 Hangman_Esteban/
 │
 ├── Sound/
-│   ├── win.wav
-│   ├── lose.wav
-│   ├── click.wav
-│   └── wrong.wav
-│
+
+    ├── win.wav
+    
+    ├── lose.wav
+    
+    ├── click.wav
+    
+    └── wrong.wav
+
 ├── Images/
-│   ├── 6.png
-│   ├── 5.png
-│   ├── ...
-│
+
+    ├── 6.png
+    
+    ├── 5.png
+    
+    ├── ...
+
 ├── Vie/
 │   ├── 6.png
 │   ├── 5.png
