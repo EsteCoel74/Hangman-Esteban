@@ -48,9 +48,15 @@ Volume global ajustable.
 Permet de fermer proprement l’application.
 
 🖥️ Technologies utilisées :
+
 -Élément	Description
+
 -Langage	C# (.NET WPF)
+
 -Framework UI	Windows Presentation Foundation (WPF)
+
 -Audio	MediaPlayer pour lire les fichiers .wav
+
 -Timer	DispatcherTimer pour le compte à rebours
+
 -Interface	XAML (liée à MainWindow.xaml.cs)
