@@ -19,28 +19,39 @@ Un minuteur et des jokers
 Une interface moderne et intuitive
 
 🚀 Fonctionnalités
+
 Fonction	Description
+
 🎚️ Difficulté réglable	Trois niveaux : Facile, Moyen, Difficile
+
 🕐 Timer intégré	Compte à rebours variable selon la difficulté
+
 ❤️ Vies limitées	6 essais maximum avant le game over
+
 🃏 Jokers	Révèlent une lettre au hasard (quantité dépendante de la difficulté)
+
 🔈 Gestion du son	Activation/désactivation du son depuis l’interface
+
 🎵 Effets audio	Sons pour victoire, défaite, clics, erreurs
+
 🖼️ Images dynamiques	Le pendu évolue à chaque erreur
+
 🔘 Bouton “Arrêter”	Permet de quitter proprement le jeu
-🖥️ Technologies utilisées
 
-Langage : C# (.NET 6 ou supérieur)
+🖥️ Technologies utilisées :
 
-Framework : WPF (Windows Presentation Foundation)
+- Langage : C# (.NET 6 ou supérieur)
 
-Interface : XAML
+- Framework : WPF (Windows Presentation Foundation)
 
-Audio : MediaPlayer
+- Interface : XAML
 
-Timer : DispatcherTimer
+- Audio : MediaPlayer
+
+- Timer : DispatcherTimer
 
 📁 Structure du projet
+
 Hangman_Esteban/
 
 ├── Sound/
@@ -83,6 +94,7 @@ Les images du pendu et des vies sont dans Images/ et Vie/
 Les chemins audio et image sont relatifs, donc fonctionnent directement après compilation
 
 ⚙️ Installation & Exécution
+
 🔧 Étape 1 — Cloner le projet
 git clone https://github.com/<ton-pseudo>/Hangman_Esteban.git
 
@@ -126,19 +138,24 @@ Une gestion dynamique de l’interface (couleurs, images, lettres, etc.).
 
 Les sons sont chargés au lancement du jeu :
 
-win.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "win.wav")));
-lose.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "lose.wav")));
-click.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "click.wav")));
-wrong.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "wrong.wav")));
+- win.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "win.wav")));
+
+- lose.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "lose.wav")));
+
+- click.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "click.wav")));
+
+- wrong.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "wrong.wav")));
+
 
 
 Le volume global est réglé ici :
 
 double volumeGeneral = 0.1; // 10% du volume
 
-🧑‍💻 Auteur
+🧑‍💻 Auteur :
 
-Esteban
+- Esteban
+
 💡 Développeur passionné par le C#, WPF et la création de jeux éducatifs.
 📫 Tu peux me retrouver sur GitHub : github.com/<ton-pseudo>
 
