@@ -1,6 +1,6 @@
 🎮 Hangman_Esteban
 
-Un jeu du Pendu moderne en C# / WPF, développé par Esteban
+Un jeu du Pendu en C# / WPF, développé par Esteban (Moi)
 Interface fluide, sons immersifs, et plusieurs niveaux de difficulté ⚡
 
 🧩 Aperçu
