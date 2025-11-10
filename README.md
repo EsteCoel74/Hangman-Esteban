@@ -7,6 +7,7 @@ Interface fluide, sons immersifs, et plusieurs niveaux de difficulté ⚡
 🧩 Aperçu
 
 Hangman_Esteban est une version revisitée du jeu du Pendu, réalisée avec Windows Presentation Foundation (WPF).
+
 Le but : deviner un mot avant que le temps ou les vies ne s’épuisent ⏳💀
 
 Le jeu inclut :
