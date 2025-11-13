@@ -1,4 +1,4 @@
-﻿// Importation des bibliothèques nécessaires
+// Importation des bibliothèques pour le système, collections, son et interface WPF
 using System;
 using System.Collections.Generic;
 using System.Media;
@@ -13,44 +13,44 @@ namespace Hangman_Esteban
     /// <summary>
     /// Code-behind principal de la fenêtre du jeu du pendu
     /// </summary>
+    // Classe principale du jeu "MainWindow"
     public partial class MainWindow : Window
     {
         // --- VARIABLES GLOBALES ---
 
-        // Minuteur utilisé pour le compte à rebours
+        // Timer utilisé pour le compte à rebours
         System.Windows.Threading.DispatcherTimer countdownTimer;
 
-        // Temps restant (en secondes)
+        // Temps restant en secondes
         int timeRemaining = 60;
 
-        // Objets audio pour les sons du jeu
+        // Lecteurs audio pour les sons du jeu
         MediaPlayer win = new MediaPlayer();
         MediaPlayer lose = new MediaPlayer();
         MediaPlayer click = new MediaPlayer();
         MediaPlayer wrong = new MediaPlayer();
 
-        // Enumération des niveaux de difficulté
+        // Enumération pour les niveaux de difficulté
         enum Difficulty { Facile, Moyen, Difficile }
 
-        // Difficulté actuelle
+        // Difficulté actuellement active
         Difficulty currentDifficulty = Difficulty.Moyen;
 
-        // Valeurs de base pour les vies et le temps
+        // Paramètres par défaut selon la difficulté
         int baseVies = 6;
         int baseTemps = 60;
 
         // Variables de jeu
-        char guessletter = ' ';   // lettre actuellement devinée
+        char guessletter = ' ';   // lettre actuellement tentée
         string motcache = "";     // mot à deviner
-        int index = 0;            // position utilisée dans certaines boucles
-        bool isMuted = false;     // état du son
-        int vie = 6;              // nombre de vies restantes
-        int jokersRestants = 0; // Nombre de jokers disponibles selon la difficulté
+        int index = 0;            // index utilisé dans certaines boucles
+        bool isMuted = false;     // indique si le son est coupé
+        int vie = 6;              // vies restantes
+        int jokersRestants = 0;   // nombre de jokers selon la difficulté
 
         // Liste de mots disponibles pour le jeu
         public List<string> ListeDeMots { get; } = new List<string>
         {
-            // (liste complète des mots français)
             "abricot","accident","acier","actrice","adresse","aigle","aile","aimant","air","alarme",
             "album","algue","alliance","allie","alouette","amande","ami","amour","ananas","ancre",
             "ange","animal","anneau","annee","antilope","appareil","appel","arbre","argent","arme",
@@ -121,18 +121,17 @@ namespace Hangman_Esteban
         // --- CONSTRUCTEUR PRINCIPAL ---
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); // initialise l'interface WPF
 
-            // Configuration du volume global (entre 0.0 et 1.0)
-            double volumeGeneral = 0.1; // ici 10% du volume
+            double volumeGeneral = 0.1; // Volume sonore global à 10%
 
-            // Chargement des sons
+            // Chargement des fichiers audio
             win.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "win.wav")));
             lose.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "lose.wav")));
             click.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "click.wav")));
             wrong.Open(new Uri(System.IO.Path.Combine(Environment.CurrentDirectory, "Sound", "wrong.wav")));
 
-            // Application du volume
+            // Application du volume à chaque son
             win.Volume = volumeGeneral;
             lose.Volume = volumeGeneral;
             click.Volume = volumeGeneral;
@@ -140,9 +139,10 @@ namespace Hangman_Esteban
 
             // Configuration du timer
             countdownTimer = new System.Windows.Threading.DispatcherTimer();
-            countdownTimer.Interval = TimeSpan.FromSeconds(1);
-            countdownTimer.Tick += CountdownTimer_Tick;
+            countdownTimer.Interval = TimeSpan.FromSeconds(1);  // déclenche chaque seconde
+            countdownTimer.Tick += CountdownTimer_Tick;          // associe l’événement
 
+            // Applique la difficulté par défaut (Moyen)
             SetDifficulty(currentDifficulty, false);
         }
 
@@ -151,150 +151,165 @@ namespace Hangman_Esteban
         // Bouton pour recommencer une partie
         public void TB_Restart_Click(object sender, RoutedEventArgs e)
         {
+            // Réinitialise le nombre de vies
             vie = baseVies;
             TB_Life.Text = $"Vies restantes: {vie}";
-            TB_Display.Text = ""; // efface l'affichage
+
+            TB_Display.Text = ""; // efface l'affichage du mot
+
+            // Met à jour l'image du pendu selon les vies
             Uri resourceUri = new Uri($"/Images/{vie}.png", UriKind.Relative);
             PenduImage.Source = new BitmapImage(resourceUri);
+
+            // Image des vies restantes
             Uri VieUri = new Uri($"/Vie/{vie}.png", UriKind.Relative);
             VieImage.Source = new BitmapImage(VieUri);
-            ResetLetterButtonColors(this); // <-- Réinitialise les couleurs des lettres
-            PrendreMotAleatoire(); // choisit un nouveau mot
 
+            // Réactive toutes les lettres visuellement
+            ResetLetterButtonColors(this);
+
+            // choisit un nouveau mot aléatoire
+            PrendreMotAleatoire();
+
+            // Joue un son (si non muet)
             if (!isMuted)
             {
-                click.Position = TimeSpan.Zero; // pour rejouer le son
+                click.Position = TimeSpan.Zero;
                 click.Play();
             }
 
+            // Réinitialise la difficulté courante
             SetDifficulty(currentDifficulty, false);
-            // Redémarre le compte à rebours
+
+            // Redémarre le timer
             countdownTimer.Stop();
             StartTimer();
         }
 
         // Définit le niveau de difficulté
-        private void SetDifficulty(Difficulty diff, bool showMessage = true)
+       private void SetDifficulty(Difficulty diff, bool showMessage = true)
         {
-            currentDifficulty = diff;
+            currentDifficulty = diff; // enregistre la difficulté choisie
 
+            // Change les valeurs vies/temps/jokers selon la difficulté
             switch (diff)
             {
                 case Difficulty.Facile:
                     baseVies = 6;
                     baseTemps = 90;
-                    jokersRestants = 3; // 3 jokers en facile
+                    jokersRestants = 3;
                     break;
                 case Difficulty.Moyen:
                     baseVies = 6;
                     baseTemps = 60;
-                    jokersRestants = 2; // 2 jokers en moyen
+                    jokersRestants = 2;
                     break;
                 case Difficulty.Difficile:
                     baseVies = 6;
                     baseTemps = 45;
-                    jokersRestants = 1; // 1 joker en difficile
+                    jokersRestants = 1;
                     break;
             }
 
-            // Met à jour les affichages
+            // Met à jour l’interface
             vie = baseVies;
             TB_Life.Text = $"Vies restantes: {vie}";
             timeRemaining = baseTemps;
             TB_Timer.Text = $"Temps restant : {timeRemaining}";
-            TB_Joker.Text = $"Jokers restants : {jokersRestants}"; // 👈 ajoute un texte dans ton interface XAML
+            TB_Joker.Text = $"Jokers restants : {jokersRestants}";
+
+            // Mets à jour les images
             Uri resourceUri = new Uri($"/Images/{vie}.png", UriKind.Relative);
             PenduImage.Source = new BitmapImage(resourceUri);
-            Uri VieUri = new Uri($"/Vie/{vie}.png", UriKind.Relative);
-            VieImage.Source = new BitmapImage(VieUri);
 
-            // Relance une nouvelle partie
+            // Relance une partie
             TB_Display.Text = "";
             PrendreMotAleatoire();
-            ResetLetterButtonColors(this); // <-- Réinitialise les couleurs
+            ResetLetterButtonColors(this);
+
             countdownTimer.Stop();
             StartTimer();
 
+            // son de clic si non muet
             if (!isMuted)
             {
-                click.Position = TimeSpan.Zero; // pour rejouer depuis le début
+                click.Position = TimeSpan.Zero;
                 click.Play();
             }
 
+            // popup d'information
             if (showMessage)
-                MessageBox.Show($"Difficulté définie sur : {diff}", "Niveau modifié", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Difficulté définie sur : {diff}", "Niveau modifié");
         }
 
         // Fonction Joker : révèle une lettre au hasard et retire une vie
-        private void UtiliserJoker()
+         private void UtiliserJoker()
         {
-            // Vérifie si on peut encore utiliser un joker
+            // Empêche l’utilisation si plus de jokers
             if (jokersRestants <= 0)
             {
-                MessageBox.Show("Tu n’as plus de jokers disponibles !", "Joker épuisé", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Tu n’as plus de jokers disponibles !");
                 return;
             }
 
-            // Vérifie qu’il reste des lettres à révéler
+            // Vérifie s’il reste des lettres cachées
             if (!TB_Display.Text.Contains("-"))
             {
                 MessageBox.Show("Le mot est déjà entièrement révélé !");
                 return;
             }
 
-            // Choisit un index au hasard parmi les lettres encore cachées
+            // Sélectionne une lettre cachée au hasard
             Random rand = new Random();
             int index;
-
             do
             {
                 index = rand.Next(motcache.Length);
             } while (TB_Display.Text[index] != '-');
 
-            // Révèle la lettre correspondante
+            // Remplace le tiret par la lettre correspondante
             var affichage = new StringBuilder(TB_Display.Text);
             affichage[index] = motcache[index];
             TB_Display.Text = affichage.ToString();
 
-            // Enlève une vie
+            // Retire une vie
             vie--;
             TB_Life.Text = $"Vies restantes: {vie}";
+
+            // Met à jour images
             Uri resourceUri = new Uri($"/Images/{vie}.png", UriKind.Relative);
             PenduImage.Source = new BitmapImage(resourceUri);
-            Uri VieUri = new Uri($"/Vie/{vie}.png", UriKind.Relative);
-            VieImage.Source = new BitmapImage(VieUri);
 
             // Diminue le nombre de jokers restants
             jokersRestants--;
             TB_Joker.Text = $"Jokers restants : {jokersRestants}";
 
+            // son
             if (!isMuted)
             {
-                click.Position = TimeSpan.Zero; // pour rejouer depuis le début
+                click.Position = TimeSpan.Zero;
                 click.Play();
             }
 
-            // Vérifie si la partie est terminée
+            // Si mot trouvé
             if (TB_Display.Text == motcache)
             {
                 countdownTimer.Stop();
                 if (!isMuted) win.Play();
-                MessageBox.Show("Félicitations! Vous avez gagné!", "Victoire", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Félicitations! Vous avez gagné!");
             }
+            // Si joueur à 0 vie
             else if (vie <= 0)
             {
                 countdownTimer.Stop();
-                if (!isMuted)
-                {
-                    lose.Position = TimeSpan.Zero; // pour rejouer depuis le début
-                    lose.Play();
-                }
-                MessageBox.Show($"Dommage! Vous avez perdu! Le mot était: {motcache}",
-                                "Défaite", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (!isMuted) lose.Play();
+
+                MessageBox.Show($"Dommage! Vous avez perdu! Le mot était: {motcache}");
                 TB_Display.Text = motcache;
                 AllLetterButtonsOff(this);
             }
         }
+
         private void TB_Joker_Click(object sender, RoutedEventArgs e)
         {
             UtiliserJoker();
@@ -398,59 +413,60 @@ namespace Hangman_Esteban
         }
 
         // Sélectionne un mot au hasard dans la liste
-        public void PrendreMotAleatoire()
+                public void PrendreMotAleatoire()
         {
             Random rand = new Random();
             List<string> motsFiltres = new List<string>();
 
-            // Filtrage des mots selon la difficulté actuelle
+            // Filtre la liste selon la difficulté
             switch (currentDifficulty)
             {
                 case Difficulty.Facile:
                     motsFiltres = ListeDeMots.FindAll(m => m.Length <= 6);
                     break;
                 case Difficulty.Moyen:
-                    motsFiltres = ListeDeMots.FindAll(m => m.Length > 6 && m.Length <10);
+                    motsFiltres = ListeDeMots.FindAll(m => m.Length > 6 && m.Length < 10);
                     break;
                 case Difficulty.Difficile:
                     motsFiltres = ListeDeMots.FindAll(m => m.Length >= 10);
                     break;
             }
 
-            // Sécurité : si la liste filtrée est vide (par précaution)
+            // Sécurité si liste vide
             if (motsFiltres.Count == 0)
                 motsFiltres = ListeDeMots;
 
-            // Choisir un mot au hasard dans la liste filtrée
+            // Tire un mot au hasard
             int N = rand.Next(motsFiltres.Count);
             motcache = motsFiltres[N];
 
-            // Prépare l'affichage avec des tirets
-            TB_Display.Text = "";
-            for (int i = 0; i < motcache.Length; i++)
-                TB_Display.Text += "-";
+            // Affiche uniquement des tirets
+            TB_Display.Text = new string('-', motcache.Length);
         }
 
         // Quand une lettre est cliquée
-        public void letter_clicked(object sender, RoutedEventArgs e)
+                public void letter_clicked(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn)
             {
-                // Récupère la lettre du bouton et la désactive
+                // récupère la lettre du bouton
                 guessletter = btn.Content.ToString().ToLower()[0];
+
+                // désactive le bouton
                 btn.IsEnabled = false;
 
-                // Vérifie la lettre
+                // teste si la lettre appartient au mot
                 BTN_Guess_Click(guessletter, btn);
 
+                // joue le clic
                 if (!isMuted)
                 {
-                    click.Position = TimeSpan.Zero; // pour rejouer depuis le début
+                    click.Position = TimeSpan.Zero;
                     click.Play();
                 }
             }
         }
-        
+ 
         // Réinitialise les couleurs de tous les boutons de lettres
         private void ResetLetterButtonColors(DependencyObject parent)
         {
@@ -477,64 +493,58 @@ namespace Hangman_Esteban
         }
 
         // Vérifie si la lettre proposée est dans le mot
-        private void BTN_Guess_Click(char letter, Button btn)
+                private void BTN_Guess_Click(char letter, Button btn)
         {
-            if (motcache.Contains(letter))
+            if (motcache.Contains(letter))  // lettre correcte
             {
-                // --- Lettre correcte ---
-                btn.Background = new SolidColorBrush(Color.FromRgb(144, 238, 144)); // vert clair
+                // bouton devient vert clair
+                btn.Background = new SolidColorBrush(Color.FromRgb(144, 238, 144));
                 btn.Foreground = new SolidColorBrush(Colors.Black);
-                btn.IsEnabled = false;
 
+                // remplace les tirets dans l'affichage
                 var affichage = new StringBuilder(TB_Display.Text);
-                int index = 0;
-                foreach (var l in motcache)
-                {
-                    if (l == letter)
-                    {
-                        affichage[index] = letter;
-                    }
-                    index++;
-                }
+
+                for (int i = 0; i < motcache.Length; i++)
+                    if (motcache[i] == letter)
+                        affichage[i] = letter;
+
                 TB_Display.Text = affichage.ToString();
 
+                // victoire ?
                 if (TB_Display.Text == motcache)
                 {
                     countdownTimer.Stop();
-                    if (!isMuted)
-                    {
-                        win.Position = TimeSpan.Zero; // pour rejouer depuis le début
-                        win.Play();
-                    }
-                    MessageBox.Show("Félicitations! Vous avez gagné!", "Victoire", MessageBoxButton.OK, MessageBoxImage.Information);
+                    if (!isMuted) win.Play();
+                    MessageBox.Show("Félicitations! Vous avez gagné!");
                 }
             }
-            else
+            else  // lettre incorrecte
             {
-                // --- Lettre incorrecte ---
-                btn.Background = new SolidColorBrush(Color.FromRgb(255, 182, 193)); // rose/rouge clair
+                // bouton devient rouge clair
+                btn.Background = new SolidColorBrush(Color.FromRgb(255, 182, 193));
                 btn.Foreground = new SolidColorBrush(Colors.Black);
-                btn.IsEnabled = false;
 
                 if (!isMuted)
                 {
-                    wrong.Position = TimeSpan.Zero; // pour rejouer depuis le début
+                    wrong.Position = TimeSpan.Zero;
                     wrong.Play();
                 }
+
+                // enlève une vie
                 vie--;
                 TB_Life.Text = $"Vies restantes: {vie}";
+
+                // met à jour les images
                 Uri resourceUri = new Uri($"/Images/{vie}.png", UriKind.Relative);
                 PenduImage.Source = new BitmapImage(resourceUri);
-                Uri VieUri = new Uri($"/Vie/{vie}.png", UriKind.Relative);
-                VieImage.Source = new BitmapImage(VieUri);
 
+                // défaite ?
                 if (vie == 0)
                 {
                     countdownTimer.Stop();
                     if (!isMuted) lose.Play();
-                    MessageBox.Show($"Dommage! Vous avez perdu! Le mot était: {motcache}",
-                                    "Défaite", MessageBoxButton.OK, MessageBoxImage.Information);
 
+                    MessageBox.Show($"Dommage! Vous avez perdu! Le mot était: {motcache}");
                     TB_Display.Text = motcache;
                     AllLetterButtonsOff(this);
                 }
