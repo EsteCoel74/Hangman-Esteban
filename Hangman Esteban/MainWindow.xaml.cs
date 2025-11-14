@@ -405,13 +405,6 @@ namespace Hangman_Esteban
             }
         }
 
-        //Arrète l'application
-        private void btnArreter_Click(object sender, RoutedEventArgs e)
-        {
-            // Par exemple, fermer l'application
-            Application.Current.Shutdown();
-        }
-
         // Sélectionne un mot au hasard dans la liste
                 public void PrendreMotAleatoire()
         {
